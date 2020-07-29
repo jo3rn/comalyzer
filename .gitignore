@@ -1,0 +1,6 @@
+.idea/
+
+__pycache__/
+
+news_dump.txt
+news_dump_date.txt
