@@ -245,22 +245,21 @@ def print_summary():
         print("".ljust(59, '#'))
         print("\n")
 
-        budgets.append((manager.name, manager.budget))
+        budgets.append((manager.name, manager.budget, manager.budget + int(manager.line_up_value * 0.25)))
 
-    # sort budgets by budget value
-    budgets.sort(key=lambda x: x[1])
-    print("\nBudget summary:")
-    for (name, budget) in budgets:
+    # sort budgets by how much more money can be spent
+    budgets.sort(key=lambda x: x[2])
+    print("\nBalance summary:")
+    for (name, budget, credit) in budgets:
         if budget < 0:
             budget_color = Fore.RED
         else:
             budget_color = Fore.GREEN
-        print("# " + budget_color + "{:11,} ".format(budget) + Style.RESET_ALL + "(" + name + ")")
+        print("# credit: {:11,} {:11} ".format(credit, name) + budget_color + "{:,}".format(budget) + Style.RESET_ALL)
 
 
 def print_line_up(manager):
     print("### LINE UP ".ljust(59, '#'))
-
     for player in manager.line_up:
         difference = player.current_value - player.purchase_price
         if difference < 0:
