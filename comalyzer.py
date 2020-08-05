@@ -225,6 +225,7 @@ def set_news_dump_date(new_dump_date):
 
 
 def print_summary():
+    budgets = []
     for manager in dict_manager.values():
         print("### {} ".format(manager.name).ljust(59, '#'))
 
@@ -235,6 +236,18 @@ def print_summary():
 
         print("".ljust(59, '#'))
         print("\n")
+
+        budgets.append((manager.name, manager.budget))
+
+    # sort budgets by budget value
+    budgets.sort(key=lambda x: x[1])
+    print("\nBudget summary:")
+    for (name, budget) in budgets:
+        if budget < 0:
+            budget_color = Fore.RED
+        else:
+            budget_color = Fore.GREEN
+        print("# " + budget_color + "{:11,} ".format(budget) + Style.RESET_ALL + "(" + name + ")")
 
 
 def print_line_up(manager):
