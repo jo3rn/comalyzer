@@ -10,6 +10,7 @@ class Manager:
         self.name = name
         self.budget = config.INITIAL_BUDGET
         self.line_up = []
+        self.line_up_value = 0
         self.history = []
 
     def change_budget(self, amount):
@@ -29,6 +30,9 @@ class Manager:
         self.line_up[:] = [x for x in self.line_up if not x.player_id == player_id]
         # adjust manager's budget
         self.change_budget(price)
+
+    def set_line_up_value(self, value):
+        self.line_up_value = int(value)
 
 
 class Player:
@@ -201,9 +205,13 @@ class SoapLoader:
         count = 0
         with self.client.settings(strict=False):
             for manager in dict_manager.values():
+                line_up_value = 0
                 for player in manager.line_up:
                     count += 1
-                    player.set_current_value(self.load_market_value_of_a_player(player.player_id))
+                    current_value = int(self.load_market_value_of_a_player(player.player_id))
+                    player.set_current_value(current_value)
+                    line_up_value += current_value
+                manager.set_line_up_value(line_up_value)
             print("Current market value of {} player(s) loaded.".format(count))
 
     def load_market_value_of_a_player(self, player_id):
@@ -252,10 +260,9 @@ def print_summary():
 
 def print_line_up(manager):
     print("### LINE UP ".ljust(59, '#'))
-    line_up_value = 0
+
     for player in manager.line_up:
         difference = player.current_value - player.purchase_price
-        line_up_value += player.current_value
         if difference < 0:
             player_color = Fore.RED
         else:
@@ -264,13 +271,13 @@ def print_line_up(manager):
                                                                  difference) + Style.RESET_ALL + " ({:10,})".format(
             player.purchase_price))
     print("".ljust(59, '#'))
-    print("#{:11,} total line up ".format(line_up_value, manager.budget))
+    print("#{:11,} total line up ".format(manager.line_up_value, manager.budget))
     if manager.budget < 0:
         budget_color = Fore.RED
     else:
         budget_color = Fore.GREEN
     print("#" + budget_color + "{:11,}".format(manager.budget) + Style.RESET_ALL + " remaining budget ")
-    diff_to_initial = -1 * (config.INITIAL_BUDGET - line_up_value - manager.budget)
+    diff_to_initial = -1 * (config.INITIAL_BUDGET - manager.line_up_value - manager.budget)
     if diff_to_initial < 0:
         diff_color = Fore.RED
     else:
