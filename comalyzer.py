@@ -1,7 +1,8 @@
 from colorama import Fore, init, Style
 from datetime import date, datetime
+from zeep import Client
+from zeep.exceptions import Fault
 import config
-import zeep
 
 
 class Manager:
@@ -211,6 +212,7 @@ class SoapLoader:
                     current_value = int(self.load_market_value_of_a_player(player.player_id))
                     player.set_current_value(current_value)
                     line_up_value += current_value
+                    print("{}: {}".format(player.name, current_value))
                 manager.set_line_up_value(line_up_value)
             print("Current market value of {} player(s) loaded.".format(count))
 
@@ -323,7 +325,7 @@ if __name__ == "__main__":
 
     # instantiate stuff
     dict_manager = {}
-    client = zeep.Client(wsdl=config.WSDL)
+    client = Client(wsdl=config.WSDL)
     soap_loader = SoapLoader(client)
     news_saver = NewsSaver()
     news_parser = NewsParser()
@@ -337,5 +339,7 @@ if __name__ == "__main__":
         print_summary()
     except ConnectionError:
         print("Connection Error")
+    except Fault:
+        print("Bad response from comunio server")
     except Exception as e:
         print(e)
